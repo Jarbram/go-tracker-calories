@@ -8,11 +8,13 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+var validate = validator.New()
 var entryCollection *mongo.Collection = OpenCollection(Client, "calories")
 
 func AddEntry(c *gin.Context) {
@@ -150,7 +152,7 @@ func UpdateIngredient(c *gin.Context) {
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 
 	type Ingredient struct {
-		Ingredients *string `json:"Ingredients"`
+		Ingredients *string `json:"ingredients"`
 	}
 
 	var ingredient Ingredient
@@ -161,7 +163,7 @@ func UpdateIngredient(c *gin.Context) {
 	}
 
 	result, err := entryCollection.UpdateOne(ctx, bson.M{"_id": docID},
-		bson.M{{"$set", bson.D{{"ingredients", ingredient.Ingredients}}}},
+		bson.D{{"$set", bson.D{{"ingredients", ingredient.Ingredients}}}},
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
