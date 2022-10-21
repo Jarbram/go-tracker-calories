@@ -1,9 +1,9 @@
-import React,{useState,useEffect} from "react";
+import React from "react";
 import  'bootstrap/dist/css/bootstrap.css';
 import { Button,Card,Row,Col } from "react-bootstrap";
 
 
-const Entry = ({entryData,setChangeIngredients,deleteSingleEntry,setChangeEntry}) => {
+const Entry = ({entryData,setChangeIngredient,deleteSingleEntry,setChangeEntry}) => {
 return(
     <Card> 
         <Row>
@@ -19,7 +19,7 @@ return(
 )
 
 function changeIngredients(){
-    setChangeIngredients({
+    setChangeIngredient({
         "change" :true,
         "id":entryData._id
     })
@@ -32,3 +32,5 @@ function changeEntry(){
     })
 }
 }
+
+export default Entry

@@ -1,6 +1,6 @@
 import React,{useState,useEffect} from "react";
 import axios from 'axios';
-import {Button,Form,Container,Modal, ModalHeader, ModalBody} from 'react-bootstrap';
+import {Button,Form,Container,Modal} from 'react-bootstrap';
 import Entry from './single-entry.components';
 
 const Entries =()=>{
@@ -30,14 +30,14 @@ const Entries =()=>{
             </Container>
 
             <Container>
-                {entries != null && entries.map((entry,i)=>{
+                {entries != null && entries.map((entry,i)=>(
                     <Entry entryData={entry} deleteSingleEntry ={deleteSingleEntry} setChangeIngredient={setChangeIngredient} setChangeEntry={setChangeEntry} />
-                })}
+                ))}
             </Container>
 
             <Modal show={addNewEntry} onHide={()=> setAddNewEntry(false)} centred>
                 <Modal.Header closeButton>
-                    <ModalTitle>Add Calory Entry</ModalTitle>
+                    <Modal.Title>Add Calory Entry</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <Form.Group>
@@ -55,7 +55,7 @@ const Entries =()=>{
                 </Modal.Body>
             </Modal>
 
-            <Modal show={changeIngredient.change} onHide={()=> setChangeIngredient({"change": false,"id":0})} centred>
+            <Modal show={changeIngredient.change} onHide={()=>setChangeIngredient({"change":false,"id":0})} centred>
                 <Modal.Header closeButton>
                     <Modal.Title>Change Ingredients</Modal.Title>
                 </Modal.Header>
@@ -69,11 +69,11 @@ const Entries =()=>{
                 </Modal.Body>
             </Modal>
 
-            <Modal show={changeEntry.change} onHide={()=>setChangeEntry({"change":false, "id":0})}>
+            <Modal show={changeEntry.change} onHide={()=>setChangeEntry({"change":false, "id":0})} centred>
                 <Modal.Header CloseButton>
                     <Modal.Title>Change Entry</Modal.Title>
                 </Modal.Header>
-                <ModalBody>
+                <Modal.Body>
                     <Form.Group>
                         <Form.Label>Dish</Form.Label>
                         <Form.Control onChange={(event) => {newEntry.dish = event.target.value}}></Form.Control>
@@ -86,10 +86,40 @@ const Entries =()=>{
                     </Form.Group>
                     <Button onClick={() => changeSingleEntry()}>Change</Button>
                     <Button onclick={() => setChangeEntry({"change":false, "id":0})}>Cancel</Button>
-                </ModalBody>
+                </Modal.Body>
             </Modal>
         </div>
     );
+
+    function changeIngredientForEntry(){
+        changeIngredient.change = false;
+        var url = "http://localhost:8000/ingredient/update/" + changeIngredient.id
+        axios.put(url, {
+            "ingredients": newIngredientsName
+        }).then(response => {
+            console.log(response.status)
+            if(response.status === 200){
+                setRefreshData(true)
+            }
+        })
+    }
+
+    function changeSingleEntry(){
+        changeEntry.change =false;
+        var url = "http://localhost:8000/entry/update/" + changeEntry.id
+        axios.put(url, {
+            "ingredients":newEntry.ingredients,
+            "dish":newEntry.dish,
+            "calories":newEntry.calories,
+            "fat":parseFloat(newEntry.fat)
+        })
+        .then(response =>{
+            if(response.status === 200){
+                setRefreshData(true)
+            }
+        })
+    }
+
     function addSingleEntry(){
         setAddNewEntry(false);
         var url = "http://localhost:8000/entry/create"
@@ -99,18 +129,18 @@ const Entries =()=>{
             "calories":newEntry.calories,
             "fat":parseFloat(newEntry.fat)
         }).then(response => {
-            if (response.status == 200){
+            if (response.status === 200){
                 setRefreshData(true)
             }
         })
     }
     
     function deleteSingleEntry(id){
-        var url ="http://localhost:8000/entry/delete" + id
+        var url ="http://localhost:8000/entry/delete/" + id
         axios.delete(url,{
     
         }).then (response => {
-            if (response.status == 200){
+            if (response.status === 200){
                 setRefreshData(true)
             }
         })
@@ -119,12 +149,13 @@ const Entries =()=>{
     function getAllEntries(){
         var url = "http://localhost:8000/entries"
         axios.get(url,{
-            responseType: "json",
+            responseType: "json"
         }).then(response => {
-            if(response.status == 200){
+            if(response.status === 200){
                 setEntries(response.data)
             }
         })
     }
 }
 
+export default Entries
